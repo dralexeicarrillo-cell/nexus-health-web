@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Globe, ShieldCheck, Activity, BrainCircuit, ChevronDown, Mail } from "lucide-react";
+import { ArrowRight, Calculator, CheckCircle, MessageCircle, Globe, ShieldCheck, Activity, BrainCircuit, ChevronDown, Mail } from "lucide-react";
 import { useState } from "react";
 
 // --- COMPONENTES UI REUTILIZABLES ---
@@ -185,6 +185,62 @@ export default function Home() {
         </div>
       </section>
 
+      {/* --- INICIO SECCIÓN CALCULADORA (NUEVO) --- */}
+      <section className="bg-slate-50 py-24 px-8">
+        <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 flex flex-col md:flex-row relative">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#F7941D]/10 rounded-bl-full -mr-8 -mt-8"></div>
+          
+          <div className="p-10 md:p-14 flex-1 space-y-6">
+            <div className="flex items-center gap-2 text-[#F7941D] font-bold text-sm uppercase tracking-wider">
+              <Calculator size={18} />
+              Diagnóstico Gratuito
+            </div>
+            
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#1A1F2C]">
+              ¿Pensando en expandir tu empresa de salud?
+            </h2>
+            
+            <p className="text-slate-600 text-lg leading-relaxed">
+              Si planeas vender productos de interés sanitario o escalar tu operación, el primer paso es conocer tu terreno. 
+              <br/><br/>
+              <strong>Revisa tu estado actual de fortaleza. Nosotros te ayudamos con el resto.</strong>
+            </p>
+
+            <ul className="space-y-3">
+              <li className="flex items-center gap-3 text-slate-700 font-medium">
+                <CheckCircle size={18} className="text-[#F7941D]" /> Estimación de costos regulatorios
+              </li>
+              <li className="flex items-center gap-3 text-slate-700 font-medium">
+                <CheckCircle size={18} className="text-[#F7941D]" /> Análisis de tiempos de entrada
+              </li>
+              <li className="flex items-center gap-3 text-slate-700 font-medium">
+                <CheckCircle size={18} className="text-[#F7941D]" /> Proyección de retorno de inversión
+              </li>
+            </ul>
+
+            <div className="pt-6">
+              <a 
+                href="https://calc.nhealths.com" 
+                target="_blank"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-[#F7941D] text-white rounded-lg font-bold text-lg hover:bg-[#d47c12] hover:shadow-lg hover:-translate-y-1 transition-all"
+              >
+                Realizar Diagnóstico Ahora
+                <ArrowRight size={20} />
+              </a>
+            </div>
+          </div>
+          
+          {/* Lado derecho visual */}
+          <div className="hidden md:block w-1/3 bg-[#1A1F2C] relative overflow-hidden">
+             <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
+             <div className="h-full flex items-center justify-center text-white/10">
+                <Calculator size={120} />
+             </div>
+          </div>
+        </div>
+      </section>
+      {/* --- FIN SECCIÓN CALCULADORA --- */}
+
       {/* --- CONTACTO / FOOTER --- */}
       <footer id="contacto" className="bg-[#1A1F2C] text-white pt-24 pb-12 px-6">
         <div className="max-w-[1400px] mx-auto grid md:grid-cols-2 gap-16 mb-24">
@@ -218,9 +274,25 @@ export default function Home() {
            <p>Diseñado con excelencia.</p>
         </div>
       </footer>
-
+      <WhatsAppButton />
     </main>
   );
+  function WhatsAppButton() {
+  return (
+    <a
+      href="https://wa.me/50672467095?text=Hola,%20me%20interesa%20fortalecer%20mi%20empresa%20de%20salud."
+      target="_blank"
+      rel="noopener noreferrer"
+      className="fixed bottom-8 right-8 z-50 flex items-center justify-center w-16 h-16 bg-[#25D366] text-white rounded-full shadow-2xl hover:bg-[#128C7E] hover:scale-110 transition-all duration-300 group"
+      aria-label="Contactar por WhatsApp"
+    >
+      <MessageCircle size={32} />
+      <span className="absolute right-full mr-4 bg-white text-slate-800 px-4 py-2 rounded-lg shadow-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+        ¡Hablemos ahora!
+      </span>
+    </a>
+  );
+}
 }
 
 // Subcomponente de Tarjeta de Servicio
@@ -241,4 +313,5 @@ function ServiceCard({ icon, title, points }: { icon: React.ReactNode, title: st
       </ul>
     </FadeUp>
   );
+   
 }
