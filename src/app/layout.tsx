@@ -27,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // CAMBIO AQUÍ: Pasamos la llave explícitamente
-    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+    // ⚠️ IMPORTANTE: Pega tu llave real dentro de las comillas abajo
+    <ClerkProvider publishableKey="pk_test_bmVhdC1vcmNhLTEwLmNsZXJrLmFjY291bnRzLmRldiQ">
       <html lang="es" className={`${playfair.variable} ${lato.variable}`}>
         <body className="font-sans antialiased bg-white text-slate-900">
           {children}
