@@ -1,16 +1,17 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Definimos qué rutas son protegidas
+// Definimos que solo lo que empiece por /dashboard es zona restringida
 const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
 
-// Agregamos 'async' antes de (auth, req)
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
-    // Esperamos a que auth() resuelva y luego protegemos
-    await auth.protect(); 
+    await auth.protect();
   }
 });
 
 export const config = {
-  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  // CAMBIO AQUÍ: Solo ejecutamos el middleware en rutas que empiecen por /dashboard
+  matcher: [
+    "/dashboard(.*)"
+  ],
 };
