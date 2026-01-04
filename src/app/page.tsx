@@ -1,65 +1,244 @@
-import Image from "next/image";
+"use client";
+
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { ArrowRight, Globe, ShieldCheck, Activity, BrainCircuit, ChevronDown, Mail } from "lucide-react";
+import { useState } from "react";
+
+// --- COMPONENTES UI REUTILIZABLES ---
+
+// Animación de entrada suave (Fade Up)
+const FadeUp = ({ children, delay = 0, className = "" }: { children: React.ReactNode, delay?: number, className?: string }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 40 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }} // Easing elegante
+    className={className}
+  >
+    {children}
+  </motion.div>
+);
+
+// Separador elegante
+const Divider = () => <div className="h-[1px] w-full bg-gray-200 my-0" />;
 
 export default function Home() {
+  const [activeAccordion, setActiveAccordion] = useState<number | null>(null);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-white text-slate-900 selection:bg-[#262262] selection:text-white font-sans">
+      
+      {/* --- NAVEGACIÓN --- */}
+      <nav className="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all">
+        <div className="max-w-[1400px] mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {/* Logo Tipográfico */}
+            <div className="leading-tight">
+              <span className="font-serif text-2xl font-bold text-[#262262] block">NHS<span className="text-[#F7941D]">+</span></span>
+            </div>
+          </div>
+          <div className="hidden md:flex gap-8 text-xs font-bold tracking-widest text-slate-500 uppercase">
+            <Link href="#expertise" className="hover:text-[#262262] transition-colors">Expertise</Link>
+            <Link href="#vision" className="hover:text-[#262262] transition-colors">Visión</Link>
+            <Link href="#contacto" className="hover:text-[#262262] transition-colors">Contacto</Link>
+          </div>
+          <Link href="/login" className="px-5 py-2 text-xs font-bold border border-slate-200 rounded-full hover:bg-[#262262] hover:text-white transition-all">
+            CLIENT ACCESS
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </nav>
+
+      {/* --- HERO SECTION --- */}
+      <section className="relative pt-40 pb-20 lg:pt-52 lg:pb-32 px-6 overflow-hidden">
+        <div className="max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          <div>
+            <FadeUp>
+              <span className="text-[#F7941D] font-bold tracking-widest text-xs uppercase mb-4 block">
+                Nexus Health Strategies
+              </span>
+              <h1 className="font-serif text-5xl md:text-7xl text-[#1A1F2C] leading-[1.1] mb-8">
+                Arquitectura <br />
+                estratégica para la <br />
+                <span className="italic text-[#262262]">salud digital.</span>
+              </h1>
+            </FadeUp>
+            
+            <FadeUp delay={0.2}>
+              <p className="text-xl font-light text-slate-600 max-w-lg leading-relaxed mb-10 border-l-2 border-[#F7941D] pl-6">
+                Consultoría especializada en la intersección crítica entre tecnología médica, regulación y estrategia de mercado en las Américas.
+              </p>
+              
+              <div className="flex gap-4">
+                 <Link href="#contacto" className="group flex items-center gap-3 bg-[#1A1F2C] text-white px-8 py-4 rounded-none hover:bg-[#262262] transition-all">
+                    Iniciar Conversación <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform"/>
+                 </Link>
+              </div>
+            </FadeUp>
+          </div>
+
+          {/* Gráfico Abstracto Animado (CSS + Framer Motion) */}
+          <FadeUp delay={0.4} className="relative h-[400px] hidden lg:flex items-center justify-center">
+            <div className="absolute inset-0 bg-gradient-to-tr from-blue-50 to-white rounded-full opacity-50 blur-3xl" />
+            
+            {/* Círculos orbitales representando "Nexus" */}
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              className="w-[400px] h-[400px] border border-slate-200 rounded-full absolute"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <motion.div 
+              animate={{ rotate: -360 }}
+              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+              className="w-[300px] h-[300px] border border-slate-300 rounded-full absolute"
+            />
+            <motion.div 
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+              className="w-[150px] h-[150px] bg-[#262262]/5 rounded-full absolute backdrop-blur-sm z-10"
+            />
+             {/* Nodo central */}
+            <div className="w-4 h-4 bg-[#F7941D] rounded-full z-20 shadow-[0_0_30px_rgba(247,148,29,0.5)]"></div>
+          </FadeUp>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <Divider />
+
+      {/* --- MISION & VISION (Editorial Layout) --- */}
+      <section id="vision" className="py-24 bg-slate-50">
+        <div className="max-w-[1400px] mx-auto px-6">
+          <div className="grid md:grid-cols-12 gap-12">
+            <div className="md:col-span-4">
+               <FadeUp>
+                 <h2 className="font-serif text-3xl md:text-4xl text-[#1A1F2C]">
+                   Nuestra <br/>Perspectiva
+                 </h2>
+               </FadeUp>
+            </div>
+            <div className="md:col-span-8 grid gap-12">
+              <FadeUp delay={0.1}>
+                <h3 className="text-sm font-bold tracking-widest text-[#F7941D] uppercase mb-3">Misión</h3>
+                <p className="text-2xl text-slate-700 leading-relaxed font-light">
+                  "Catalizar la adopción tecnológica segura en el sector salud, eliminando las barreras burocráticas y técnicas que separan la innovación de los pacientes."
+                </p>
+              </FadeUp>
+              <FadeUp delay={0.2}>
+                <h3 className="text-sm font-bold tracking-widest text-[#F7941D] uppercase mb-3">Visión</h3>
+                <p className="text-xl text-slate-600 leading-relaxed font-light">
+                  Visualizamos un continente americano unido por estándares de datos interoperables, donde una startup en Costa Rica pueda escalar a EE.UU., y una tecnología global pueda aterrizar localmente con total cumplimiento regulatorio.
+                </p>
+              </FadeUp>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Divider />
+
+      {/* --- EXPERTISE / SERVICIOS (Grid Style) --- */}
+      <section id="expertise" className="py-24 px-6 bg-white">
+        <div className="max-w-[1400px] mx-auto">
+          <FadeUp>
+             <div className="flex flex-col md:flex-row justify-between items-end mb-16">
+                <h2 className="font-serif text-4xl text-[#1A1F2C]">Capacidades Centrales</h2>
+                <p className="text-slate-500 max-w-md text-right mt-4 md:mt-0">Soluciones integrales diseñadas para instituciones, gobiernos y empresas healthtech.</p>
+             </div>
+          </FadeUp>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Servicio 1 */}
+            <ServiceCard 
+              icon={<BrainCircuit size={40} />}
+              title="Transformación Digital"
+              points={[
+                "Implementación de Expedientes Electrónicos (EMR)",
+                "Interoperabilidad (HL7, FHIR)",
+                "Gestión del Cambio Organizacional",
+                "Diseño de flujos de Telemedicina"
+              ]}
+            />
+             {/* Servicio 2 */}
+             <ServiceCard 
+              icon={<ShieldCheck size={40} />}
+              title="Regulación & Compliance"
+              points={[
+                "Registros Sanitarios (LatAm & FDA)",
+                "Validación de Software como Dispositivo Médico (SaMD)",
+                "Privacidad de Datos (HIPAA / Leyes Locales)",
+                "Auditoría de Procesos Clínicos"
+              ]}
+            />
+             {/* Servicio 3 */}
+             <ServiceCard 
+              icon={<Globe size={40} />}
+              title="Expansión de Mercado"
+              points={[
+                "Estrategias Soft-Landing (USA <-> LatAm)",
+                "Inteligencia de Mercado Público y Privado",
+                "Alianzas Estratégicas y Joint Ventures",
+                "Consultoría en Salud Pública"
+              ]}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* --- CONTACTO / FOOTER --- */}
+      <footer id="contacto" className="bg-[#1A1F2C] text-white pt-24 pb-12 px-6">
+        <div className="max-w-[1400px] mx-auto grid md:grid-cols-2 gap-16 mb-24">
+           <div>
+              <h2 className="font-serif text-4xl md:text-5xl mb-6">Conectemos.</h2>
+              <p className="text-slate-400 text-lg font-light max-w-md mb-8">
+                Si su organización está lista para el siguiente nivel de madurez digital, estamos listos para guiar el camino.
+              </p>
+              <a href="mailto:gerencia@nhealths.com" className="inline-flex items-center gap-3 text-[#F7941D] text-xl font-bold hover:gap-6 transition-all">
+                 gerencia@nhealths.com <ArrowRight />
+              </a>
+           </div>
+           
+           {/* Información Rápida */}
+           <div className="grid grid-cols-2 gap-8 text-sm text-slate-400">
+              <div>
+                 <h4 className="text-white font-bold uppercase tracking-widest mb-4">Sede</h4>
+                 <p>San José, Costa Rica</p>
+                 <p>Operaciones Globales</p>
+              </div>
+              <div>
+                 <h4 className="text-white font-bold uppercase tracking-widest mb-4">Legal</h4>
+                 <Link href="#" className="block hover:text-white mb-2">Aviso de Privacidad</Link>
+                 <Link href="#" className="block hover:text-white">Términos de Uso</Link>
+              </div>
+           </div>
+        </div>
+
+        <div className="max-w-[1400px] mx-auto border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
+           <p>© {new Date().getFullYear()} NexusHealth Strategies. Todos los derechos reservados.</p>
+           <p>Diseñado con excelencia.</p>
+        </div>
+      </footer>
+
+    </main>
+  );
+}
+
+// Subcomponente de Tarjeta de Servicio
+function ServiceCard({ icon, title, points }: { icon: React.ReactNode, title: string, points: string[] }) {
+  return (
+    <FadeUp className="group p-8 border border-gray-200 hover:border-[#262262] bg-white hover:shadow-xl transition-all duration-300">
+      <div className="text-[#262262] mb-6 group-hover:scale-110 transition-transform origin-left">
+        {icon}
+      </div>
+      <h3 className="font-serif text-2xl text-[#1A1F2C] mb-6">{title}</h3>
+      <ul className="space-y-3">
+        {points.map((point, index) => (
+          <li key={index} className="flex items-start gap-3 text-sm text-slate-600 font-light">
+             <span className="mt-1.5 w-1.5 h-1.5 bg-[#F7941D] rounded-full flex-shrink-0" />
+             {point}
+          </li>
+        ))}
+      </ul>
+    </FadeUp>
   );
 }
