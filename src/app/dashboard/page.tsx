@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { Calculator, FileText, ArrowUpRight, Database, ShieldAlert } from "lucide-react";
 
+
+// ESTA LÍNEA EVITA EL ERROR DE PRERENDER
+export const dynamic = 'force-dynamic';
 export default function DashboardPage() {
   return (
     <div>
