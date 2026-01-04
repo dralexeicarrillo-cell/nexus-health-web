@@ -29,6 +29,7 @@ export default function DashboardLayout({
           <NavItem href="https://calc.nhealths.com" icon={<Calculator size={20} />} label="Calculadora LatAm" external />
           <NavItem href="/dashboard/clientes" icon={<Users size={20} />} label="Clientes" />
           <NavItem href="/dashboard/docs" icon={<FileText size={20} />} label="Documentación" />
+          <NavItem href="/dashboard/calculadora-interna" icon={<Calculator size={20} />} label="Calculadora Costos" />
         </nav>
 
         <div className="p-4 border-t border-slate-700 space-y-2">
