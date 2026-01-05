@@ -14,8 +14,8 @@ export default function LoginPage() {
         </div>
         
         <div className="flex justify-center mt-8">
-          {/* El componente de Login oficial de Clerk */}
-          <SignIn routing="hash" />
+          {/* Forzamos la redirección al Dashboard al terminar */}
+            <SignIn forceRedirectUrl="/dashboard" />
         </div>
       </div>
     </div>
