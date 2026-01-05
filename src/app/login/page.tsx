@@ -14,8 +14,11 @@ export default function LoginPage() {
         </div>
         
         <div className="flex justify-center mt-8">
-          {/* Forzamos la redirección al Dashboard al terminar */}
-            <SignIn forceRedirectUrl="/dashboard" />
+          {/* VOLVEMOS A PONER "HASH" PARA QUE NO PIDA RUTAS RARAS */}
+          <SignIn 
+            routing="hash" 
+            forceRedirectUrl="/dashboard" 
+          />
         </div>
       </div>
     </div>
