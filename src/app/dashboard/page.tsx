@@ -1,21 +1,15 @@
 import Link from "next/link";
-import { currentUser } from "@clerk/nextjs/server"; // Importamos la función del servidor
-import { Calculator, FileText, ArrowUpRight, Database, ShieldAlert, LayoutDashboard } from "lucide-react";
+import { Calculator, FileText, ArrowUpRight, Database } from "lucide-react";
 
-// Forzamos modo dinámico para que siempre traiga el nombre fresco
+// Mantenemos esto para que la página siempre esté fresca
 export const dynamic = 'force-dynamic';
 
-export default async function DashboardPage() {
-  // Obtenemos el usuario actual
-  const user = await currentUser();
-  // Intentamos obtener el primer nombre, si no existe, usamos "Doctor"
-  const userName = user?.firstName || "Doctor";
-
+export default function DashboardPage() {
   return (
     <div>
       <div className="mb-8">
-        {/* Aquí usamos la variable userName */}
-        <h2 className="text-2xl font-bold text-[#1A1F2C]">Bienvenido, {userName}.</h2>
+        {/* CAMBIO AQUÍ: Texto simple y directo, sin riesgo de error */}
+        <h2 className="text-2xl font-bold text-[#1A1F2C]">Bienvenido.</h2>
         <p className="text-slate-500">Seleccione una herramienta para comenzar.</p>
       </div>
 
