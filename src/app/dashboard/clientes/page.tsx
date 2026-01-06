@@ -52,7 +52,7 @@ export default function ClientsPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Cartera de Clientes</h1>
+          <h1 className="text-2xl font-bold text-slate-800">Cartera de Clientes (En vivo)</h1>
           <p className="text-slate-500 text-sm">Leads generados desde la Calculadora LATAM</p>
         </div>
         <button 
