@@ -2,7 +2,9 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import DownloadReportButton from "@/components/DownloadReportButton"; // Importamos el botón
+import DownloadReportButton from "@/components/DownloadReportButton";
+import ClientDossier from "@/components/ClientDossier"; // <--- NUEVO
+import ArchiveClientButton from "@/components/ArchiveClientButton"; // <--- NUEVO
 import { 
   ArrowLeft, 
   Mail, 
@@ -55,7 +57,7 @@ export default async function ClientDetailPage({
 
   const answers = client.answers || {};
 
-  // --- 3. MOTOR DE INTELIGENCIA (LÓGICA DEL PDF) ---
+  // --- 3. MOTOR DE INTELIGENCIA ---
   const getStrategicAnalysis = (score: number) => {
     if (score < 40) return {
         phase: "Fase 1: Preparación Técnica",
@@ -94,42 +96,22 @@ export default async function ClientDetailPage({
     {
         title: "Fase 1: Preparación Previa",
         minScore: 0,
-        items: [
-            "Análisis de clasificación de producto (SaMD vs Físico)",
-            "Obtención de Certificado de Libre Venta (origen)",
-            "Certificación ISO 13485 o BPM vigente",
-            "Due diligence de requisitos específicos por país"
-        ]
+        items: ["Análisis clasificación SaMD", "Certificado Libre Venta", "ISO 13485"]
     },
     {
         title: "Fase 2: Establecimiento Legal",
         minScore: 40,
-        items: [
-            "Constitución de sociedad o contrato de Hosting",
-            "Obtención de identificación fiscal (RFC/NIT/RUT)",
-            "Nombramiento de Responsable Técnico certificado",
-            "Establecimiento de sistema de Tecnovigilancia"
-        ]
+        items: ["Constitución / Hosting", "Identificación Fiscal", "Responsable Técnico"]
     },
     {
         title: "Fase 3: Registro Sanitario",
         minScore: 60,
-        items: [
-            "Preparación de Dossier (Formato CTD o local)",
-            "Traducción jurada de documentos clínicos",
-            "Sometimiento de solicitud y pago de tasas",
-            "Respuesta a prevenciones de la autoridad"
-        ]
+        items: ["Dossier CTD", "Traducciones Juradas", "Sometimiento Autoridad"]
     },
     {
         title: "Fase 4: Comercialización",
         minScore: 80,
-        items: [
-            "Registro en portales de compras públicas",
-            "Etiquetado local (Normas Oficiales)",
-            "Contratos con distribuidores/aseguradoras",
-            "Plan de renovación de registros (5 años)"
-        ]
+        items: ["Etiquetado NOM/RTCA", "Contratos Distribución", "Licitaciones Públicas"]
     }
   ];
 
@@ -155,68 +137,72 @@ export default async function ClientDetailPage({
             <div>
                <h1 className="text-3xl font-serif font-bold text-slate-800">{client.company_name}</h1>
                <div className="flex items-center gap-2 text-sm text-slate-500 mt-1">
-                  <span className="bg-slate-100 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider text-slate-600">
-                    {client.status === 'active' ? 'Cliente Activo' : 'Lead'}
+                  <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider ${
+                      client.status === 'archived' ? 'bg-red-100 text-red-600' : 
+                      client.status === 'active' ? 'bg-green-100 text-green-600' : 
+                      'bg-slate-100 text-slate-600'
+                  }`}>
+                    {client.status === 'active' ? 'Cliente Activo' : client.status === 'archived' ? 'Archivado' : 'Lead'}
                   </span>
                   <span>• {new Date(client.created_at).toLocaleDateString()}</span>
                </div>
             </div>
          </div>
-         <div className={`${getScoreColor(client.total_score)} text-white px-6 py-3 rounded-xl font-bold shadow-lg flex flex-col items-center min-w-[140px]`}>
-            <span className="text-xs uppercase opacity-80 tracking-wider">Score Global</span>
-            <span className="text-3xl">{client.total_score}</span>
+         
+         <div className="flex items-center gap-4">
+            {/* BOTÓN ARCHIVAR NUEVO */}
+            <ArchiveClientButton clientId={client.id} currentStatus={client.status} />
+
+            <div className={`${getScoreColor(client.total_score)} text-white px-6 py-3 rounded-xl font-bold shadow-lg flex flex-col items-center min-w-[140px]`}>
+                <span className="text-xs uppercase opacity-80 tracking-wider">Score Global</span>
+                <span className="text-3xl">{client.total_score}</span>
+            </div>
          </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
          
-         {/* COLUMNA IZQUIERDA (Datos) */}
+         {/* COLUMNA IZQUIERDA */}
          <div className="lg:col-span-4 space-y-6">
             <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                <h3 className="text-xs font-bold text-[#F7941D] uppercase tracking-widest mb-6 flex items-center gap-2">
                   <Building size={16} /> Ficha del Cliente
                </h3>
                <div className="space-y-4">
-                  <div>
-                     <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Contacto</p>
-                     <p className="font-semibold text-slate-800">{client.contact_name}</p>
-                     <p className="text-xs text-slate-500">{client.contact_position}</p>
-                  </div>
+                  <p className="text-sm"><strong>Contacto:</strong> {client.contact_name}</p>
                   <div className="w-full h-[1px] bg-slate-50"></div>
-                  <div>
-                     <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Email</p>
-                     <a href={`mailto:${client.company_email}`} className="font-medium text-slate-800 flex items-center gap-2 hover:text-[#F7941D] break-all">
-                        <Mail size={14} /> {client.company_email}
-                     </a>
-                  </div>
+                  <p className="text-sm"><strong>Email:</strong> {client.company_email}</p>
                   <div className="w-full h-[1px] bg-slate-50"></div>
-                   <div>
-                     <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Teléfono</p>
-                     <p className="font-medium text-slate-800 flex items-center gap-2">
-                        <Phone size={14} /> {answers.phone || "No registrado"}
-                     </p>
-                  </div>
+                  <p className="text-sm"><strong>Teléfono:</strong> {answers.phone || "No registrado"}</p>
                </div>
             </div>
+
+            {/* EXPEDIENTE DIGITAL (NUEVO) */}
+            {(client.status === 'active' || client.status === 'archived') ? (
+                <ClientDossier clientId={client.id} />
+            ) : (
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-center">
+                    <Lock className="mx-auto text-slate-400 mb-2" size={24} />
+                    <h3 className="text-sm font-bold text-slate-600">Expediente Bloqueado</h3>
+                    <p className="text-xs text-slate-500 mt-1">Activa este cliente para habilitar la carga de documentos.</p>
+                </div>
+            )}
 
             <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
                <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-4 flex items-center gap-2">
                   <Globe size={16} /> Market Insight
                </h3>
-               <p className="text-sm text-slate-600 italic mb-4">
-                  "{analysis.marketInsight}"
-               </p>
+               <p className="text-sm text-slate-600 italic mb-4">"{analysis.marketInsight}"</p>
                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <BrainCircuit size={14} />
-                  <span>Fuente: Investigación Interna NHS+</span>
+                  <BrainCircuit size={14} /> <span>Fuente: Investigación Interna NHS+</span>
                </div>
             </div>
          </div>
 
-         {/* COLUMNA DERECHA (Estrategia + Checklist + Botón) */}
+         {/* COLUMNA DERECHA */}
          <div className="lg:col-span-8 space-y-8">
             
-            {/* 1. TARJETA DE ESTRATEGIA (Resumen) */}
+            {/* ESTRATEGIA */}
             <div className="bg-[#0f172a] text-white p-8 rounded-2xl shadow-xl relative overflow-hidden">
                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#262262] rounded-full blur-[120px] opacity-40 -mr-20 -mt-20 pointer-events-none"></div>
                <div className="relative z-10">
@@ -240,52 +226,29 @@ export default async function ClientDetailPage({
                </div>
             </div>
 
-            {/* 2. PLAN DE EJECUCIÓN DETALLADO (CHECKLIST) */}
+            {/* CHECKLIST */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                    <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                        <ListTodo className="text-[#F7941D]" /> 
-                        Plan de Ejecución Detallado
-                    </h3>
+                    <h3 className="font-bold text-slate-800 flex items-center gap-2"><ListTodo className="text-[#F7941D]" /> Plan de Ejecución</h3>
                     <span className="text-xs text-slate-400">Basado en metodología regulatoria LatAm</span>
                 </div>
-                
                 <div className="divide-y divide-slate-100">
                     {MASTER_CHECKLIST.map((phase, idx) => {
                         const isCompleted = client.total_score >= (phase.minScore + 20); 
                         const isCurrent = client.total_score >= phase.minScore && client.total_score < (phase.minScore + 20);
-                        
                         return (
                             <div key={idx} className={`p-6 ${isCurrent ? 'bg-blue-50/30' : ''}`}>
                                 <div className="flex items-center gap-3 mb-4">
-                                    {isCompleted ? (
-                                        <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
-                                            <CheckCircle2 size={14} />
-                                        </div>
-                                    ) : isCurrent ? (
-                                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center animate-pulse">
-                                            <Clock size={14} />
-                                        </div>
-                                    ) : (
-                                        <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-300 flex items-center justify-center">
-                                            <Circle size={14} />
-                                        </div>
-                                    )}
-                                    
-                                    <h4 className={`font-bold ${isCurrent ? 'text-blue-700' : isCompleted ? 'text-slate-700' : 'text-slate-400'}`}>
-                                        {phase.title}
-                                    </h4>
-                                    
-                                    {isCurrent && <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full uppercase">Fase Actual</span>}
+                                    {isCompleted ? <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center"><CheckCircle2 size={14} /></div> : 
+                                     isCurrent ? <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center animate-pulse"><Clock size={14} /></div> : 
+                                     <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-300 flex items-center justify-center"><Circle size={14} /></div>}
+                                    <h4 className={`font-bold ${isCurrent ? 'text-blue-700' : isCompleted ? 'text-slate-700' : 'text-slate-400'}`}>{phase.title}</h4>
                                 </div>
-
                                 <div className="pl-9 space-y-3">
                                     {phase.items.map((item, i) => (
                                         <div key={i} className="flex items-start gap-3 text-sm">
                                             <div className={`mt-1.5 w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-green-400' : isCurrent ? 'bg-blue-400' : 'bg-slate-300'}`}></div>
-                                            <span className={`${isCompleted ? 'text-slate-500 line-through' : isCurrent ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
-                                                {item}
-                                            </span>
+                                            <span className={`${isCompleted ? 'text-slate-500 line-through' : isCurrent ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>{item}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -295,42 +258,19 @@ export default async function ClientDetailPage({
                 </div>
             </div>
 
-            {/* 3. RESPUESTAS RAW */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-               <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
-                  <FileText size={20} className="text-slate-400"/> Datos de la Evaluación
-               </h3>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                  {Object.entries(answers).slice(0, 10).map(([key, val]: any, i) => (
-                     <div key={i} className="flex justify-between items-center border-b border-slate-50 pb-2">
-                        <span className="text-xs text-slate-500 uppercase">{key.replace(/_/g, " ")}</span>
-                        <span className="text-sm font-medium text-slate-800">
-                           {typeof val === 'boolean' ? (val ? 'Sí' : 'No') : val}
-                        </span>
-                     </div>
-                  ))}
-               </div>
-            </div>
-
-            {/* --- SECCIÓN DEL BOTÓN PDF (CORREGIDO) --- */}
+            {/* BOTÓN PDF */}
             <div className="bg-gradient-to-r from-slate-50 to-white p-8 rounded-2xl border border-dashed border-slate-300 flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
-                    <div className="bg-white p-3 rounded-full shadow-sm border border-slate-100 text-[#F7941D]">
-                        <FileText size={24} />
-                    </div>
+                    <div className="bg-white p-3 rounded-full shadow-sm border border-slate-100 text-[#F7941D]"><FileText size={24} /></div>
                     <div>
                         <h3 className="text-slate-800 font-bold text-lg">Reporte Ejecutivo Oficial</h3>
-                        <p className="text-slate-500 text-sm max-w-sm">
-                            Descarga el diagnóstico completo en formato PDF, listo para presentar al cliente.
-                        </p>
+                        <p className="text-slate-500 text-sm max-w-sm">Descarga el diagnóstico completo en formato PDF.</p>
                     </div>
                 </div>
-                
-                {/* Botón de descarga */}
                 <DownloadReportButton client={client} />
             </div>
 
-         </div> {/* Fin de columna derecha */}
+         </div> 
       </div>
     </div>
   );
