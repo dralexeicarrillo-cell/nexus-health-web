@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import Link from 'next/link' // <--- IMPORTANTE: Necesario para navegar
 
-// Definimos la "forma" que tienen tus datos para que TypeScript no se queje
 interface Client {
   id: string
   created_at: string
@@ -15,7 +15,6 @@ interface Client {
 }
 
 export default function ClientsPage() {
-  // Aquí le decimos: "Esto será una lista de Clientes"
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -32,7 +31,6 @@ export default function ClientsPage() {
 
       if (error) throw error
       
-      // Forzamos a TypeScript a entender que 'data' son nuestros Clientes
       setClients((data as any) || [])
     } catch (error: any) {
       console.error('Error cargando clientes:', error.message)
@@ -78,9 +76,12 @@ export default function ClientsPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {clients.map((client) => (
-                <tr key={client.id} className="hover:bg-slate-50 transition">
+                <tr key={client.id} className="hover:bg-slate-50 transition group">
                   <td className="px-6 py-4">
-                    <div className="font-bold text-slate-900">{client.company_name}</div>
+                    {/* ENLACE EN EL NOMBRE */}
+                    <Link href={`/dashboard/clientes/${client.id}`} className="font-bold text-slate-900 hover:text-blue-600 hover:underline">
+                        {client.company_name}
+                    </Link>
                     <div className="text-sm text-slate-500">{client.contact_name}</div>
                     <div className="text-xs text-slate-400">{client.company_email}</div>
                   </td>
@@ -95,12 +96,24 @@ export default function ClientsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <a 
-                      href={`mailto:${client.company_email}`}
-                      className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
-                    >
-                      Contactar
-                    </a>
+                    <div className="flex items-center justify-center gap-3">
+                        {/* BOTÓN DE VER DETALLE */}
+                        <Link 
+                            href={`/dashboard/clientes/${client.id}`}
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-bold border border-slate-300 transition flex items-center gap-1"
+                        >
+                            👁️ Ver Radiografía
+                        </Link>
+                        
+                        {/* EMAIL RÁPIDO */}
+                        <a 
+                        href={`mailto:${client.company_email}`}
+                        title="Enviar correo"
+                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition"
+                        >
+                        ✉️
+                        </a>
+                    </div>
                   </td>
                 </tr>
               ))}
