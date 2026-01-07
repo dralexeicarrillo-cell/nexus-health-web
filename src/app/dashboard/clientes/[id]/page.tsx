@@ -2,31 +2,33 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import DownloadReportButton from "@/components/DownloadReportButton"; // Importamos el botón
 import { 
   ArrowLeft, 
   Mail, 
   Phone, 
   Building, 
-  MapPin,
-  Calendar, 
-  Lock,
-  CheckCircle2,
-  AlertCircle
+  Globe, 
+  Lock, 
+  CheckCircle2, 
+  TrendingUp, 
+  BrainCircuit, 
+  FileText,
+  ListTodo,
+  Clock,
+  Circle
 } from "lucide-react";
 
-// --- CORRECCIÓN TÉCNICA PARA NEXT.JS 15 ---
-// Usamos la definición exacta que espera el sistema
+// --- INTERFAZ PARA NEXT.JS 15 ---
 export default async function ClientDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   
-  // 1. DESEMPAQUETAR EL ID (AWAIT)
-  // Esto soluciona el error rojo de la consola sin romper la página
   const { id } = await params;
 
-  // 2. SEGURIDAD (Solo Admin)
+  // 1. SEGURIDAD
   const user = await currentUser();
   const metadata = user?.publicMetadata as any;
   const role = String(metadata?.role || "").trim().toLowerCase();
@@ -35,7 +37,7 @@ export default async function ClientDetailPage({
     redirect('/dashboard/docs');
   }
 
-  // 3. OBTENER DATOS (Supabase)
+  // 2. OBTENER DATOS
   const { data: client, error } = await supabase
     .from('assessments')
     .select('*')
@@ -45,19 +47,92 @@ export default async function ClientDetailPage({
   if (error || !client) {
     return (
       <div className="p-12 text-center min-h-screen bg-slate-50 flex flex-col items-center justify-center">
-        <div className="bg-red-50 text-red-500 w-16 h-16 rounded-full flex items-center justify-center mb-4 border border-red-100">
-            <AlertCircle size={32} />
-        </div>
         <h1 className="text-2xl font-bold text-slate-800">Cliente no encontrado</h1>
-        <p className="text-slate-500 mb-6 max-w-md">El ID buscado no existe en la base de datos o fue eliminado recientemente.</p>
-        <Link href="/dashboard/clientes" className="bg-[#1A1F2C] text-white px-6 py-3 rounded-lg hover:bg-slate-800 transition-all font-medium">
-            Volver a la lista
-        </Link>
+        <Link href="/dashboard/clientes" className="mt-4 text-blue-600 hover:underline">Volver a la lista</Link>
       </div>
     );
   }
 
-  // --- LOGICA VISUAL ---
+  const answers = client.answers || {};
+
+  // --- 3. MOTOR DE INTELIGENCIA (LÓGICA DEL PDF) ---
+  const getStrategicAnalysis = (score: number) => {
+    if (score < 40) return {
+        phase: "Fase 1: Preparación Técnica",
+        color: "text-red-600",
+        description: "La empresa requiere estructuración técnica base antes de iniciar trámites legales.",
+        marketInsight: "El 60% de los fallos ocurren por mala clasificación de riesgo inicial.",
+        actions: ["Definir Clasificación de Riesgo", "Auditoría técnica", "Evaluación ISO 13485"]
+    };
+    if (score < 60) return {
+        phase: "Fase 2: Establecimiento Legal",
+        color: "text-yellow-600",
+        description: "Producto viable. Se requiere constitución local o 'Hosting' regulatorio.",
+        marketInsight: "Obligatorio contar con Titular de Registro local en mercados principales.",
+        actions: ["Designar Representante Legal", "Apostillado de documentos", "Tecnovigilancia"]
+    };
+    if (score < 80) return {
+        phase: "Fase 3: Registro Sanitario",
+        color: "text-blue-600",
+        description: "Listo para someter Dossiers a la autoridad sanitaria.",
+        marketInsight: "Tiempo estimado COFEPRIS: 6-8 meses. INVIMA: 4-6 meses.",
+        actions: ["Armado de Dossier Técnico", "Traducción certificada", "Sometimiento digital"]
+    };
+    return {
+        phase: "Fase 4: Expansión Comercial",
+        color: "text-green-600",
+        description: "Foco en comercialización, licitaciones y mantenimiento.",
+        marketInsight: "Oportunidad de acceso multi-país vía sistema RTCA (Centroamérica).",
+        actions: ["Homologación RTCA", "Estrategia B2G", "Certificación BPA"]
+    };
+  };
+
+  const analysis = getStrategicAnalysis(client.total_score);
+
+  // --- 4. CHECKLIST MAESTRO ---
+  const MASTER_CHECKLIST = [
+    {
+        title: "Fase 1: Preparación Previa",
+        minScore: 0,
+        items: [
+            "Análisis de clasificación de producto (SaMD vs Físico)",
+            "Obtención de Certificado de Libre Venta (origen)",
+            "Certificación ISO 13485 o BPM vigente",
+            "Due diligence de requisitos específicos por país"
+        ]
+    },
+    {
+        title: "Fase 2: Establecimiento Legal",
+        minScore: 40,
+        items: [
+            "Constitución de sociedad o contrato de Hosting",
+            "Obtención de identificación fiscal (RFC/NIT/RUT)",
+            "Nombramiento de Responsable Técnico certificado",
+            "Establecimiento de sistema de Tecnovigilancia"
+        ]
+    },
+    {
+        title: "Fase 3: Registro Sanitario",
+        minScore: 60,
+        items: [
+            "Preparación de Dossier (Formato CTD o local)",
+            "Traducción jurada de documentos clínicos",
+            "Sometimiento de solicitud y pago de tasas",
+            "Respuesta a prevenciones de la autoridad"
+        ]
+    },
+    {
+        title: "Fase 4: Comercialización",
+        minScore: 80,
+        items: [
+            "Registro en portales de compras públicas",
+            "Etiquetado local (Normas Oficiales)",
+            "Contratos con distribuidores/aseguradoras",
+            "Plan de renovación de registros (5 años)"
+        ]
+    }
+  ];
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return "bg-green-600 shadow-green-200";
     if (score >= 60) return "bg-blue-600 shadow-blue-200";
@@ -65,183 +140,198 @@ export default async function ClientDetailPage({
     return "bg-red-500 shadow-red-200";
   };
 
-  const answers = client.answers || {};
-
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 md:px-8 space-y-8 animate-in fade-in duration-500">
       
-      {/* HEADER SUPERIOR */}
+      {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
          <div className="flex items-center gap-4">
             <Link 
               href="/dashboard/clientes" 
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-500 hover:text-[#262262] hover:border-[#262262] transition-all shadow-sm"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-500 hover:text-[#262262] transition-all shadow-sm"
             >
                <ArrowLeft size={20} />
             </Link>
             <div>
                <h1 className="text-3xl font-serif font-bold text-slate-800">{client.company_name}</h1>
                <div className="flex items-center gap-2 text-sm text-slate-500 mt-1">
-                  <Calendar size={14}/>
-                  <span>Evaluación realizada el {new Date(client.created_at).toLocaleDateString('es-CR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                  <span className="bg-slate-100 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider text-slate-600">
+                    {client.status === 'active' ? 'Cliente Activo' : 'Lead'}
+                  </span>
+                  <span>• {new Date(client.created_at).toLocaleDateString()}</span>
                </div>
             </div>
          </div>
-         
          <div className={`${getScoreColor(client.total_score)} text-white px-6 py-3 rounded-xl font-bold shadow-lg flex flex-col items-center min-w-[140px]`}>
             <span className="text-xs uppercase opacity-80 tracking-wider">Score Global</span>
-            <span className="text-2xl">{client.total_score}/100</span>
+            <span className="text-3xl">{client.total_score}</span>
          </div>
       </div>
 
-      {/* GRID DE INFORMACIÓN */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
          
-         {/* COLUMNA IZQUIERDA (4 columnas) */}
+         {/* COLUMNA IZQUIERDA (Datos) */}
          <div className="lg:col-span-4 space-y-6">
-            
-            {/* Tarjeta de Contacto */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                <h3 className="text-xs font-bold text-[#F7941D] uppercase tracking-widest mb-6 flex items-center gap-2">
-                  <Building size={16} /> Contacto Principal
+                  <Building size={16} /> Ficha del Cliente
                </h3>
-               
-               <div className="space-y-5">
-                  <div className="group">
-                     <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Nombre</p>
-                     <p className="font-semibold text-slate-800 text-lg group-hover:text-[#262262] transition-colors">{client.contact_name}</p>
-                     <p className="text-sm text-slate-500">{client.contact_position || "Cargo no especificado"}</p>
+               <div className="space-y-4">
+                  <div>
+                     <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Contacto</p>
+                     <p className="font-semibold text-slate-800">{client.contact_name}</p>
+                     <p className="text-xs text-slate-500">{client.contact_position}</p>
                   </div>
-                  
                   <div className="w-full h-[1px] bg-slate-50"></div>
-
-                  <div className="group">
+                  <div>
                      <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Email</p>
-                     <a href={`mailto:${client.company_email}`} className="font-medium text-slate-800 flex items-center gap-2 hover:text-[#F7941D] transition-colors break-all">
-                        <Mail size={16} className="text-slate-300 group-hover:text-[#F7941D]" /> {client.company_email}
+                     <a href={`mailto:${client.company_email}`} className="font-medium text-slate-800 flex items-center gap-2 hover:text-[#F7941D] break-all">
+                        <Mail size={14} /> {client.company_email}
                      </a>
                   </div>
-
                   <div className="w-full h-[1px] bg-slate-50"></div>
-
-                  <div className="group">
+                   <div>
                      <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Teléfono</p>
                      <p className="font-medium text-slate-800 flex items-center gap-2">
-                        <Phone size={16} className="text-slate-300" /> {answers.phone || "No registrado"}
+                        <Phone size={14} /> {answers.phone || "No registrado"}
                      </p>
                   </div>
                </div>
             </div>
 
-            {/* Tarjeta de Desglose de Puntaje */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-               <h3 className="text-sm font-bold text-slate-800 mb-5">Desglose de Áreas</h3>
-               <div className="space-y-4">
-                  {/* Valores simulados para el ejemplo visual, podrías calcularlos real si la data existiera */}
-                  <ScoreRow label="Estrategia Corporativa" val={Math.min(100, client.total_score + 10)} />
-                  <ScoreRow label="Madurez de Producto" val={Math.min(100, client.total_score + 20)} />
-                  <ScoreRow label="Cumplimiento Regulatorio" val={client.total_score} highlight />
-                  <ScoreRow label="Infraestructura Técnica" val={Math.min(100, client.total_score + 5)} />
-                  <ScoreRow label="Modelo Comercial" val={Math.max(0, client.total_score - 10)} />
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+               <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <Globe size={16} /> Market Insight
+               </h3>
+               <p className="text-sm text-slate-600 italic mb-4">
+                  "{analysis.marketInsight}"
+               </p>
+               <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <BrainCircuit size={14} />
+                  <span>Fuente: Investigación Interna NHS+</span>
                </div>
             </div>
          </div>
 
-         {/* COLUMNA DERECHA (8 columnas) */}
-         <div className="lg:col-span-8 space-y-6">
+         {/* COLUMNA DERECHA (Estrategia + Checklist + Botón) */}
+         <div className="lg:col-span-8 space-y-8">
             
-            {/* TARJETA OSCURA (HOJA DE RUTA) */}
-            <div className="bg-[#0f172a] text-white p-8 rounded-2xl shadow-xl relative overflow-hidden group">
-               {/* Efecto de fondo */}
-               <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#262262] rounded-full blur-[100px] opacity-50 -mr-20 -mt-20 pointer-events-none group-hover:opacity-70 transition-opacity duration-700"></div>
-               
+            {/* 1. TARJETA DE ESTRATEGIA (Resumen) */}
+            <div className="bg-[#0f172a] text-white p-8 rounded-2xl shadow-xl relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#262262] rounded-full blur-[120px] opacity-40 -mr-20 -mt-20 pointer-events-none"></div>
                <div className="relative z-10">
                   <h3 className="text-xl font-bold flex items-center gap-3 mb-3 text-[#F7941D]">
-                     <Lock size={24} /> Hoja de Ruta (IP Interna)
+                     <Lock size={24} /> Estrategia Generada: {analysis.phase.split(':')[0]}
                   </h3>
-                  <p className="text-slate-400 text-sm mb-8 max-w-xl">
-                     Estas son las acciones estratégicas generadas por el algoritmo de Nexus Health Strategies basadas en el perfil de {client.company_name}.
-                  </p>
-
+                  <p className="text-slate-400 text-sm mb-6 max-w-2xl">{analysis.description}</p>
                   <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm">
-                     <h4 className="font-bold text-blue-300 mb-2 text-sm uppercase tracking-wide">Diagnóstico Técnico</h4>
-                     <p className="text-sm text-slate-300 mb-6 leading-relaxed">
-                        La infraestructura técnica muestra solidez, pero existen brechas en la alineación con estándares regulatorios internacionales (FDA/MDR) que podrían bloquear la expansión.
-                     </p>
-                     
-                     <div className="space-y-4">
-                        <ActionStep text="Priorizar implementación de HL7 FHIR para interoperabilidad regional." />
-                        <ActionStep text="Iniciar documentación de validación de Software como Dispositivo Médico (SaMD)." />
-                        <ActionStep text="Desarrollar estrategia de protección de datos alineada a HIPAA para entrada a mercado US." />
+                     <h4 className="font-bold text-blue-300 mb-4 text-sm uppercase tracking-wide flex items-center gap-2">
+                        <TrendingUp size={16}/> Acciones Inmediatas
+                     </h4>
+                     <div className="space-y-3">
+                        {analysis.actions.map((action, i) => (
+                           <div key={i} className="flex items-start gap-3">
+                              <CheckCircle2 size={18} className="text-green-400 mt-0.5 flex-shrink-0" />
+                              <span className="text-sm text-slate-300">{action}</span>
+                           </div>
+                        ))}
                      </div>
                   </div>
                </div>
             </div>
 
-            {/* RESPUESTAS CRÍTICAS */}
-            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-               <div className="flex items-center gap-3 mb-8 pb-4 border-b border-slate-50">
-                   <div className="bg-blue-50 p-2 rounded-lg text-blue-600">
-                      <CheckCircle2 size={24}/> 
-                   </div>
-                   <div>
-                      <h3 className="text-lg font-bold text-slate-800">Respuestas Críticas</h3>
-                      <p className="text-xs text-slate-400">Datos clave extraídos de la evaluación</p>
-                   </div>
-               </div>
-               
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                  {Object.entries(answers).slice(0, 8).map(([key, val]: any, i) => (
-                     <div key={i} className="group">
-                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2 group-hover:text-[#F7941D] transition-colors">
-                            {key.replace(/_/g, " ")}
-                        </p>
-                        <div className="font-medium text-slate-700 bg-slate-50 p-3 rounded-lg border border-transparent group-hover:border-slate-200 transition-all">
-                           {typeof val === 'boolean' ? (
-                               val ? <span className="text-green-600 flex items-center gap-2"><CheckCircle2 size={14}/> Afirmativo</span> : <span className="text-slate-500">Negativo</span>
-                           ) : val}
-                        </div>
+            {/* 2. PLAN DE EJECUCIÓN DETALLADO (CHECKLIST) */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                        <ListTodo className="text-[#F7941D]" /> 
+                        Plan de Ejecución Detallado
+                    </h3>
+                    <span className="text-xs text-slate-400">Basado en metodología regulatoria LatAm</span>
+                </div>
+                
+                <div className="divide-y divide-slate-100">
+                    {MASTER_CHECKLIST.map((phase, idx) => {
+                        const isCompleted = client.total_score >= (phase.minScore + 20); 
+                        const isCurrent = client.total_score >= phase.minScore && client.total_score < (phase.minScore + 20);
+                        
+                        return (
+                            <div key={idx} className={`p-6 ${isCurrent ? 'bg-blue-50/30' : ''}`}>
+                                <div className="flex items-center gap-3 mb-4">
+                                    {isCompleted ? (
+                                        <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                                            <CheckCircle2 size={14} />
+                                        </div>
+                                    ) : isCurrent ? (
+                                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center animate-pulse">
+                                            <Clock size={14} />
+                                        </div>
+                                    ) : (
+                                        <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-300 flex items-center justify-center">
+                                            <Circle size={14} />
+                                        </div>
+                                    )}
+                                    
+                                    <h4 className={`font-bold ${isCurrent ? 'text-blue-700' : isCompleted ? 'text-slate-700' : 'text-slate-400'}`}>
+                                        {phase.title}
+                                    </h4>
+                                    
+                                    {isCurrent && <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full uppercase">Fase Actual</span>}
+                                </div>
+
+                                <div className="pl-9 space-y-3">
+                                    {phase.items.map((item, i) => (
+                                        <div key={i} className="flex items-start gap-3 text-sm">
+                                            <div className={`mt-1.5 w-1.5 h-1.5 rounded-full ${isCompleted ? 'bg-green-400' : isCurrent ? 'bg-blue-400' : 'bg-slate-300'}`}></div>
+                                            <span className={`${isCompleted ? 'text-slate-500 line-through' : isCurrent ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
+                                                {item}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* 3. RESPUESTAS RAW */}
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+               <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                  <FileText size={20} className="text-slate-400"/> Datos de la Evaluación
+               </h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+                  {Object.entries(answers).slice(0, 10).map(([key, val]: any, i) => (
+                     <div key={i} className="flex justify-between items-center border-b border-slate-50 pb-2">
+                        <span className="text-xs text-slate-500 uppercase">{key.replace(/_/g, " ")}</span>
+                        <span className="text-sm font-medium text-slate-800">
+                           {typeof val === 'boolean' ? (val ? 'Sí' : 'No') : val}
+                        </span>
                      </div>
                   ))}
                </div>
             </div>
 
-         </div>
+            {/* --- SECCIÓN DEL BOTÓN PDF (CORREGIDO) --- */}
+            <div className="bg-gradient-to-r from-slate-50 to-white p-8 rounded-2xl border border-dashed border-slate-300 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                    <div className="bg-white p-3 rounded-full shadow-sm border border-slate-100 text-[#F7941D]">
+                        <FileText size={24} />
+                    </div>
+                    <div>
+                        <h3 className="text-slate-800 font-bold text-lg">Reporte Ejecutivo Oficial</h3>
+                        <p className="text-slate-500 text-sm max-w-sm">
+                            Descarga el diagnóstico completo en formato PDF, listo para presentar al cliente.
+                        </p>
+                    </div>
+                </div>
+                
+                {/* Botón de descarga */}
+                <DownloadReportButton client={client} />
+            </div>
+
+         </div> {/* Fin de columna derecha */}
       </div>
     </div>
   );
-}
-
-// --- COMPONENTES UI AUXILIARES ---
-
-function ScoreRow({ label, val, highlight = false }: { label: string, val: number, highlight?: boolean }) {
-   return (
-      <div className="flex justify-between items-center group cursor-default">
-         <span className={`text-sm transition-colors ${highlight ? 'font-bold text-slate-800' : 'text-slate-500 group-hover:text-slate-700'}`}>
-            {label}
-         </span>
-         <div className="flex items-center gap-3">
-             <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden hidden sm:block">
-                <div 
-                    className={`h-full rounded-full ${highlight ? 'bg-[#F7941D]' : 'bg-slate-300'}`} 
-                    style={{ width: `${val}%` }}
-                ></div>
-             </div>
-             <span className={`text-xs font-bold px-2 py-1 rounded min-w-[40px] text-center ${highlight ? 'bg-[#F7941D]/10 text-[#d47c12]' : 'bg-slate-100 text-slate-600'}`}>
-                {val}
-             </span>
-         </div>
-      </div>
-   );
-}
-
-function ActionStep({ text }: { text: string }) {
-   return (
-      <div className="flex items-start gap-3 group">
-         <div className="mt-0.5 min-w-[20px]">
-            <CheckCircle2 size={18} className="text-green-400 group-hover:text-green-300 transition-colors shadow-sm" />
-         </div>
-         <span className="text-sm text-slate-300 group-hover:text-white transition-colors">{text}</span>
-      </div>
-   );
 }
