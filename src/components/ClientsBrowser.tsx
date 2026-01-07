@@ -16,7 +16,8 @@ import {
   Briefcase
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { toast } from "sonner"; // Si no tienes sonner, puedes usar alert() o instalarlo
+
+// --- NOTA: Se eliminó la importación de "sonner" para evitar errores de compilación ---
 
 interface ClientLead {
   id: string;
@@ -26,14 +27,14 @@ interface ClientLead {
   contact_name: string;
   contact_position: string;
   total_score: number;
-  status: string; // Nuevo campo
+  status: string;
 }
 
 export default function ClientsBrowser() {
   const [clients, setClients] = useState<ClientLead[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState<'active' | 'lead'>('active'); // Control de pestañas
+  const [activeTab, setActiveTab] = useState<'active' | 'lead'>('active');
 
   // --- 1. CARGA DE DATOS ---
   useEffect(() => {
@@ -59,35 +60,35 @@ export default function ClientsBrowser() {
 
   // --- 2. FUNCIÓN PARA ACTIVAR CLIENTE ---
   async function promoteToClient(id: string, currentName: string) {
+    // Usamos window.confirm nativo en lugar de componentes externos
     const confirm = window.confirm(`¿Deseas activar a "${currentName}" como cliente oficial?`);
     if (!confirm) return;
 
     try {
       const { error } = await supabase
         .from('assessments')
-        .update({ status: 'active' }) // Cambiamos el estado
+        .update({ status: 'active' })
         .eq('id', id);
 
       if (error) throw error;
       
-      // Actualizamos la lista localmente para ver el cambio inmediato
+      // Actualizamos la lista localmente
       setClients(prev => prev.map(c => c.id === id ? { ...c, status: 'active' } : c));
-      alert("¡Cliente activado exitosamente!"); // O usa toast.success()
+      
+      // Usamos alert nativo
+      alert("¡Cliente activado exitosamente!"); 
       
     } catch (error: any) {
       console.error("Error al activar:", error);
-      alert("No se pudo activar el cliente");
+      alert("No se pudo activar el cliente. Verifica los permisos en Supabase.");
     }
   }
 
   // --- 3. LÓGICA DE FILTRADO ---
   const filteredList = clients.filter(c => {
-    // Primero filtramos por pestaña (status)
-    // Si el campo status es null en DB, lo tratamos como 'lead'
     const currentStatus = c.status || 'lead';
     if (currentStatus !== activeTab) return false;
 
-    // Luego por buscador
     const search = searchTerm.toLowerCase();
     return (
       (c.company_name || "").toLowerCase().includes(search) ||
@@ -171,7 +172,7 @@ export default function ClientsBrowser() {
          />
       </div>
 
-      {/* --- LISTA DE TARJETAS --- */}
+      {/* --- LISTA --- */}
       {loading ? (
          <div className="py-20 text-center text-slate-400 flex flex-col items-center gap-3">
             <Loader2 size={40} className="animate-spin text-[#F7941D]" />
@@ -226,11 +227,10 @@ export default function ClientsBrowser() {
                       </div>
                   </div>
 
-                  {/* ACCIONES (Diferentes según pestaña) */}
+                  {/* ACCIONES */}
                   <div className="flex items-center justify-end w-full md:w-auto mt-4 md:mt-0 gap-3">
                       
                       {activeTab === 'lead' ? (
-                        /* Botón para ACTIVAR (Solo en leads) */
                         <button 
                             onClick={() => promoteToClient(client.id, client.company_name)}
                             className="flex items-center gap-2 bg-[#1A1F2C] text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors shadow-sm text-sm font-bold"
@@ -239,7 +239,6 @@ export default function ClientsBrowser() {
                             Activar Cliente
                         </button>
                       ) : (
-                        /* Botón para GESTIONAR (Solo en activos) */
                         <Link 
                             href={`/dashboard/clientes/${client.id}`}
                             className="flex items-center gap-2 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg hover:bg-[#F7941D] hover:text-white transition-colors text-sm font-medium"
