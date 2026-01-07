@@ -1,8 +1,9 @@
 "use client";
 
+import Header from '@/components/Header'
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Calculator, CheckCircle, MessageCircle, Globe, ShieldCheck, Activity, BrainCircuit, ChevronDown, Mail } from "lucide-react";
+import { ArrowRight, Calculator, CheckCircle, MessageCircle, Globe, ShieldCheck, BrainCircuit } from "lucide-react";
 import { useState } from "react";
 
 // --- COMPONENTES UI REUTILIZABLES ---
@@ -13,7 +14,7 @@ const FadeUp = ({ children, delay = 0, className = "" }: { children: React.React
     initial={{ opacity: 0, y: 40 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: "-50px" }}
-    transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }} // Easing elegante
+    transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
     className={className}
   >
     {children}
@@ -29,28 +30,11 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white text-slate-900 selection:bg-[#262262] selection:text-white font-sans">
       
-      {/* --- NAVEGACIÓN --- */}
-      <nav className="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-all">
-        <div className="max-w-[1400px] mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {/* Logo Tipográfico */}
-            <div className="leading-tight">
-              <span className="font-serif text-2xl font-bold text-[#262262] block">NHS<span className="text-[#F7941D]">+</span></span>
-            </div>
-          </div>
-          <div className="hidden md:flex gap-8 text-xs font-bold tracking-widest text-slate-500 uppercase">
-            <Link href="#expertise" className="hover:text-[#262262] transition-colors">Expertise</Link>
-            <Link href="#vision" className="hover:text-[#262262] transition-colors">Visión</Link>
-            <Link href="#contacto" className="hover:text-[#262262] transition-colors">Contacto</Link>
-          </div>
-          <Link href="/login" className="px-5 py-2 text-xs font-bold border border-slate-200 rounded-full hover:bg-[#262262] hover:text-white transition-all">
-            CLIENT ACCESS
-          </Link>
-        </div>
-      </nav>
+      {/* --- HEADER NUEVO CON LOGO --- */}
+      <Header />
 
       {/* --- HERO SECTION --- */}
-      <section className="relative pt-40 pb-20 lg:pt-52 lg:pb-32 px-6 overflow-hidden">
+      <section className="relative py-20 lg:py-32 px-6 overflow-hidden">
         <div className="max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-16 items-center">
           <div>
             <FadeUp>
@@ -71,17 +55,16 @@ export default function Home() {
               
               <div className="flex gap-4">
                  <Link href="#contacto" className="group flex items-center gap-3 bg-[#1A1F2C] text-white px-8 py-4 rounded-none hover:bg-[#262262] transition-all">
-                    Iniciar Conversación <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform"/>
+                   Iniciar Conversación <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform"/>
                  </Link>
               </div>
             </FadeUp>
           </div>
 
-          {/* Gráfico Abstracto Animado (CSS + Framer Motion) */}
+          {/* Gráfico Abstracto Animado */}
           <FadeUp delay={0.4} className="relative h-[400px] hidden lg:flex items-center justify-center">
             <div className="absolute inset-0 bg-gradient-to-tr from-blue-50 to-white rounded-full opacity-50 blur-3xl" />
             
-            {/* Círculos orbitales representando "Nexus" */}
             <motion.div 
               animate={{ rotate: 360 }}
               transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
@@ -98,7 +81,6 @@ export default function Home() {
               transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
               className="w-[150px] h-[150px] bg-[#262262]/5 rounded-full absolute backdrop-blur-sm z-10"
             />
-             {/* Nodo central */}
             <div className="w-4 h-4 bg-[#F7941D] rounded-full z-20 shadow-[0_0_30px_rgba(247,148,29,0.5)]"></div>
           </FadeUp>
         </div>
@@ -106,7 +88,7 @@ export default function Home() {
 
       <Divider />
 
-      {/* --- MISION & VISION (Editorial Layout) --- */}
+      {/* --- MISION & VISION --- */}
       <section id="vision" className="py-24 bg-slate-50">
         <div className="max-w-[1400px] mx-auto px-6">
           <div className="grid md:grid-cols-12 gap-12">
@@ -137,7 +119,7 @@ export default function Home() {
 
       <Divider />
 
-      {/* --- EXPERTISE / SERVICIOS (Grid Style) --- */}
+      {/* --- EXPERTISE / SERVICIOS --- */}
       <section id="expertise" className="py-24 px-6 bg-white">
         <div className="max-w-[1400px] mx-auto">
           <FadeUp>
@@ -148,7 +130,6 @@ export default function Home() {
           </FadeUp>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Servicio 1 */}
             <ServiceCard 
               icon={<BrainCircuit size={40} />}
               title="Transformación Digital"
@@ -159,7 +140,6 @@ export default function Home() {
                 "Diseño de flujos de Telemedicina"
               ]}
             />
-             {/* Servicio 2 */}
              <ServiceCard 
               icon={<ShieldCheck size={40} />}
               title="Regulación & Compliance"
@@ -170,7 +150,6 @@ export default function Home() {
                 "Auditoría de Procesos Clínicos"
               ]}
             />
-             {/* Servicio 3 */}
              <ServiceCard 
               icon={<Globe size={40} />}
               title="Expansión de Mercado"
@@ -185,7 +164,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- INICIO SECCIÓN CALCULADORA (NUEVO) --- */}
+      {/* --- SECCIÓN CALCULADORA --- */}
       <section className="bg-slate-50 py-24 px-8">
         <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 flex flex-col md:flex-row relative">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#F7941D]/10 rounded-bl-full -mr-8 -mt-8"></div>
@@ -219,6 +198,7 @@ export default function Home() {
             </ul>
 
             <div className="pt-6">
+              {/* --- AQUÍ ESTABA EL ERROR: AHORA APUNTA A LA URL REAL --- */}
               <a 
                 href="https://calc.nhealths.com" 
                 target="_blank"
@@ -230,7 +210,6 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Lado derecho visual */}
           <div className="hidden md:block w-1/3 bg-[#1A1F2C] relative overflow-hidden">
              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
              <div className="h-full flex items-center justify-center text-white/10">
@@ -239,9 +218,8 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* --- FIN SECCIÓN CALCULADORA --- */}
 
-      {/* --- CONTACTO / FOOTER --- */}
+      {/* --- FOOTER --- */}
       <footer id="contacto" className="bg-[#1A1F2C] text-white pt-24 pb-12 px-6">
         <div className="max-w-[1400px] mx-auto grid md:grid-cols-2 gap-16 mb-24">
            <div>
@@ -250,22 +228,21 @@ export default function Home() {
                 Si su organización está lista para el siguiente nivel de madurez digital, estamos listos para guiar el camino.
               </p>
               <a href="mailto:gerencia@nhealths.com" className="inline-flex items-center gap-3 text-[#F7941D] text-xl font-bold hover:gap-6 transition-all">
-                 gerencia@nhealths.com <ArrowRight />
+                  gerencia@nhealths.com <ArrowRight />
               </a>
            </div>
            
-           {/* Información Rápida */}
            <div className="grid grid-cols-2 gap-8 text-sm text-slate-400">
-              <div>
-                 <h4 className="text-white font-bold uppercase tracking-widest mb-4">Sede</h4>
-                 <p>San José, Costa Rica</p>
-                 <p>Operaciones Globales</p>
-              </div>
-              <div>
-                 <h4 className="text-white font-bold uppercase tracking-widest mb-4">Legal</h4>
-                 <Link href="#" className="block hover:text-white mb-2">Aviso de Privacidad</Link>
-                 <Link href="#" className="block hover:text-white">Términos de Uso</Link>
-              </div>
+             <div>
+                <h4 className="text-white font-bold uppercase tracking-widest mb-4">Sede</h4>
+                <p>San José, Costa Rica</p>
+                <p>Operaciones Globales</p>
+             </div>
+             <div>
+                <h4 className="text-white font-bold uppercase tracking-widest mb-4">Legal</h4>
+                <Link href="#" className="block hover:text-white mb-2">Aviso de Privacidad</Link>
+                <Link href="#" className="block hover:text-white">Términos de Uso</Link>
+             </div>
            </div>
         </div>
 
@@ -274,10 +251,16 @@ export default function Home() {
            <p>Diseñado con excelencia.</p>
         </div>
       </footer>
+
+      {/* Botón flotante WhatsApp */}
       <WhatsAppButton />
     </main>
   );
-  function WhatsAppButton() {
+}
+
+// --- SUB-COMPONENTES FUERA DE LA FUNCIÓN PRINCIPAL ---
+
+function WhatsAppButton() {
   return (
     <a
       href="https://wa.me/50672467095?text=Hola,%20me%20interesa%20fortalecer%20mi%20empresa%20de%20salud."
@@ -293,9 +276,7 @@ export default function Home() {
     </a>
   );
 }
-}
 
-// Subcomponente de Tarjeta de Servicio
 function ServiceCard({ icon, title, points }: { icon: React.ReactNode, title: string, points: string[] }) {
   return (
     <FadeUp className="group p-8 border border-gray-200 hover:border-[#262262] bg-white hover:shadow-xl transition-all duration-300">
@@ -313,5 +294,4 @@ function ServiceCard({ icon, title, points }: { icon: React.ReactNode, title: st
       </ul>
     </FadeUp>
   );
-   
 }
