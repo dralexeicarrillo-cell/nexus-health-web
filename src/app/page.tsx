@@ -290,10 +290,19 @@ export default function Home() {
                 <h4 className="text-white font-bold uppercase tracking-widest mb-6 flex items-center gap-2 text-xs">
                   <ShieldCheck size={14} className="text-[#F7941D]"/> Legal
                 </h4>
-                <ul className="space-y-3">
-                  <li><Link href="#" className="hover:text-white transition-colors hover:underline">Aviso de Privacidad</Link></li>
-                  <li><Link href="#" className="hover:text-white transition-colors hover:underline">Términos de Uso</Link></li>
-                </ul>
+              <ul className="space-y-3">
+                   <li>
+                     <Link href="/politica-privacidad" className="hover:text-white transition-colors hover:underline">
+                        Política de Privacidad
+                     </Link>
+                   </li>
+                   <li>
+                     <Link href="/aviso-legal" className="hover:text-white transition-colors hover:underline">
+                        Aviso Legal
+                     </Link>
+                   </li>
+                 </ul>
+                
              </FadeUp>
            </div>
         </div>
